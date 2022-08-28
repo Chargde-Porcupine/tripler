@@ -1,0 +1,9 @@
+Goals:
+1.Serves Rants, ravings, etc.  Crawls directory to serve these.
+2.Should allow users to send in rants, raving etc. Rant, ravings, etc should send me an email.
+3.I should be able to click on a link in that email, which could send a request that updates the site.
+
+route : "/tripler/*"
+-try to open the file, if it works, construct the HTML and be done
+-if url is /new, send to /new
+-otherwise, send to /all
