@@ -3,6 +3,22 @@ Goals:
 2.Should allow users to send in rants, raving etc. Rant, ravings, etc should send me an email.
 3.I should be able to click on a link in that email, which could send a request that updates the site.
 
+contruct site from 1 file:
+1.take from json, path giver as param
+2.sanitize title and body
+3.strscat <html><h1>[TITLE]</h1><hr><p>[BODY]</p></html>
+4.return that string
+
+construct site of all files:
+0.string starts as <html>
+1.loop thru folder, for each file in folder:
+2.construct section with this format: <h3>[TITLE]</h3><br><p>[BODY]</p><hr>
+3.add constructed to current using strscat
+4.endloop
+5.add </html> to end
+6.return constructed string
+
+
 route : "/tripler/*"
 -try to open the file, if it works, construct the HTML and be done
 -if url is /new, send to /new
