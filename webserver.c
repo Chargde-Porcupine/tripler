@@ -11,57 +11,21 @@ struct _u_instance instance;
 
 int route_catchall(const struct _u_request *request, struct _u_response *response, void *user_data)
 {
-    FILE *fp;
-    puts(request->http_url);
-    fp = fopen(strs_cat((const char *[]){STARTDIR, request->http_url, ""}), "r");
-    if (fp == NULL)
-    {
-        ulfius_set_string_body_response(response, 404, "Resource Not Found");
-        return U_CALLBACK_COMPLETE;
-    }
-
-    if (fseek(fp, 0L, SEEK_END) != 0)
+    char *responsetext = construct_one(strs_cat((const char *[]){"/home/matthew/Documents/cweb/tripleR/", request->http_url, ".json", ""}));
+    if (!responsetext)
     {
         ulfius_set_string_body_response(response, 500, "Server Error");
-        return U_CALLBACK_COMPLETE;
-    };
-    int sz = ftell(fp);
-    char ch[sz];
-    rewind(fp);
-    fread(ch, 1, sz, (FILE *)fp);
+        return U_CALLBACK_CONTINUE;
+    }
     u_map_put(response->map_header, "Content-Type", "text/html");
-    ulfius_set_binary_body_response(response, 200, ch, sz);
+    ulfius_set_binary_body_response(response, 200, responsetext, strlen(responsetext));
+    free(responsetext);
     return U_CALLBACK_CONTINUE;
 }
 
 int route_index(const struct _u_request *request, struct _u_response *response, void *user_data)
 {
-    json_t *root;
-    json_error_t error;
-    FILE *fp;
-    fp = fopen("wisdoms.json", "r");
-    if (fp == NULL)
-    {
-        ulfius_set_string_body_response(response, 404, "Resource Not Found");
-        return U_CALLBACK_COMPLETE;
-    }
-    if (fseek(fp, 0L, SEEK_END) != 0)
-    {
-        puts("e");
-        ulfius_set_string_body_response(response, 500, "Server Error");
-        return U_CALLBACK_COMPLETE;
-    };
-    int sz = ftell(fp);
-    char ch[sz];
-    rewind(fp);
-    fread(ch, 1, sz, (FILE *)fp);
-    ch[sz] = '\0';
-    root = json_loads(ch, 0, &error);
-    if (!root)
-    {
-        ulfius_set_string_body_response(response, 500, "Server Error");
-        return U_CALLBACK_COMPLETE;
-    }
+    json_t *root = open_json("wisdoms.json");
     if (!json_is_array(root))
     {
         fprintf(stderr, "error: root is not an array\n");
