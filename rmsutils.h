@@ -93,7 +93,7 @@ char *construct_one(char *filepath)
 char *construct_all()
 {
     struct dirent *files;
-    char *returned = "<html><h1>Rants,Ravings and Ramblings.</h1>";
+    char *returned = "<html><h1>Rants,Ravings and Ramblings.</h1><hr>";
     DIR *dir = opendir("/home/matthew/Documents/cweb/tripleR");
     if (!dir)
     {
@@ -102,17 +102,17 @@ char *construct_all()
     while ((files = readdir(dir)) != NULL)
     {
         json_t *filejson = open_json(strs_cat((const char *[]){"/home/matthew/Documents/cweb/tripleR/", files->d_name, ""}));
-        puts(strs_cat((const char *[]){"/home/matthew/Documents/cweb/tripleR/", files->d_name, ""}));
+        puts(files->d_name);
         if (!filejson)
         {
-            break;
+            continue;
         }
-        if (!json_is_object(filejson))
+        if (!json_is_object(filejson) || !json_object_get(filejson, "Title") || !json_object_get(filejson, "Body") || !json_object_get(filejson, "Link"))
         {
             json_decref(filejson);
-            break;
+            continue;
         }
-        returned = strs_cat((const char *[]){returned, "<h3>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Title")), ">"), "<"), "</h3><br><p>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Body")), ">"), "<"), "</p><hr>", ""});
+        returned = strs_cat((const char *[]){returned, "<h2><a href='", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Link")), ">"), "<"), "'>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Title")), ">"), "<"), "</a></h2><p>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Body")), ">"), "<"), "</p><hr>", ""});
     }
     closedir(dir);
     return returned;
