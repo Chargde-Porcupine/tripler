@@ -22,7 +22,7 @@ char *strs_cat(const char **strs)
     for (int i = 0; strs[i][0] != '\0'; ++i)
     {
         curr_len += strlen(strs[i]);
-        output = realloc(output, curr_len * sizeof(char));
+        output = realloc(output, (curr_len+1) * sizeof(char));
         if (i == 0)
         {
             strcpy(output, strs[i]);
@@ -112,7 +112,7 @@ char *construct_all()
             json_decref(filejson);
             continue;
         }
-        returned = strs_cat((const char *[]){returned, "<h2><a href='", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Link")), ">"), "<"), "'>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Title")), ">"), "<"), "</a></h2><p>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Body")), ">"), "<"), "</p><hr>", ""});
+        returned = strs_cat((const char *[]){returned, "<h2><a href='http://localhost:8000/", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Link")), ">"), "<"), "'>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Title")), ">"), "<"), "</a></h2><p>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Body")), ">"), "<"), "</p><hr>", ""});
     }
     closedir(dir);
     return returned;
