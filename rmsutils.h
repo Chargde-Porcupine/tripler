@@ -3,6 +3,7 @@
 #include <string.h> //string functions like strcat() and strcpy()
 #include <malloc.h> //memory allocation
 #include <time.h>   //self explanatory...
+#include <dirent.h> //crawl directories
 
 // gcc -I /home/matthew/Documents/cweb/ webserver.c -lulfius -ljansson
 char *strs_cat(const char **strs);
@@ -89,8 +90,32 @@ char *construct_one(char *filepath)
     return strs_cat((const char *[]){"<html> <h1>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Title")), ">"), "<"), "</h1> <hr> <p>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Body")), ">"), "<"), "</p> </html>", ""});
 }
 
-char *construct_all(){
-    
+char *construct_all()
+{
+    struct dirent *files;
+    char *returned = "<html><h1>Rants,Ravings and Ramblings.</h1>";
+    DIR *dir = opendir("/home/matthew/Documents/cweb/tripleR");
+    if (!dir)
+    {
+        return NULL;
+    }
+    while ((files = readdir(dir)) != NULL)
+    {
+        json_t *filejson = open_json(strs_cat((const char *[]){"/home/matthew/Documents/cweb/tripleR/", files->d_name, ""}));
+        puts(strs_cat((const char *[]){"/home/matthew/Documents/cweb/tripleR/", files->d_name, ""}));
+        if (!filejson)
+        {
+            break;
+        }
+        if (!json_is_object(filejson))
+        {
+            json_decref(filejson);
+            break;
+        }
+        returned = strs_cat((const char *[]){returned, "<h3>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Title")), ">"), "<"), "</h3><br><p>", sanitize(sanitize((char *)json_string_value(json_object_get(filejson, "Body")), ">"), "<"), "</p><hr>", ""});
+    }
+    closedir(dir);
+    return returned;
 }
 
 json_t *open_json(char *filepath)

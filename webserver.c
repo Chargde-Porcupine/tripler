@@ -11,7 +11,12 @@ struct _u_instance instance;
 
 int route_catchall(const struct _u_request *request, struct _u_response *response, void *user_data)
 {
-    char *responsetext = construct_one(strs_cat((const char *[]){"/home/matthew/Documents/cweb/tripleR/", request->http_url, ".json", ""}));
+    char *responsetext;
+    if(strcmp(request->http_url, "/all") == 0){
+        responsetext = construct_all();
+    }else{
+    responsetext = construct_one(strs_cat((const char *[]){"/home/matthew/Documents/cweb/tripleR/", request->http_url, ".json", ""}));
+    }
     if (!responsetext)
     {
         ulfius_set_string_body_response(response, 500, "Server Error");
